@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './spp.controller';
 import { AuthModule } from './auth/auth.module';
 import { PollsModule } from './pools/polls.module';
+import { VoteModule } from './votes/vote.module';
 
 @Module({
   imports: [
@@ -18,8 +19,9 @@ import { PollsModule } from './pools/polls.module';
       }),
     }),
     AuthModule,
-    PollsModule
+    PollsModule,
+    VoteModule,
   ],
-  controllers: [AppController]
+  controllers: [AppController],
 })
 export class AppModule {}

@@ -7,6 +7,8 @@ import {
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { use } from 'passport';
+import { Role } from './roles.decorator';
 
 
 @Injectable()
@@ -42,8 +44,15 @@ export class AuthService {
       throw new UnauthorizedException('The Password is incorrect...🥲');
     }
     const payload = { sub: user._id, email: user.email, role: user.role };
-    const tockon = await this.jwtService.sign(payload);
+    const token = await this.jwtService.sign(payload);
 
-    return {tockon};
+    return {token:token, 
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+     };
   }
 }

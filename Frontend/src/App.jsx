@@ -8,6 +8,8 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedWrapper from "./components/ProtectedWrapper";
+import CreatePolls from "./Pages/CreatePolls";
+import UpdatePolls from "./Pages/UpdatePolls";
 
 const App = () => {
   return (
@@ -25,6 +27,8 @@ const App = () => {
           />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/create-poll" element={<CreatePolls />} />
+          <Route path="/update-poll" element={<UpdatePolls />} />
         </Routes>
         <ToastContainer
           position="top-right"

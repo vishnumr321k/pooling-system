@@ -20,11 +20,11 @@ export class PollService {
     expiryTime: Date,
     createdBy: Types.ObjectId,
   ) {
-    if (new Date(expiryTime).getTime() - Date.now() > 2 * 60 * 60 * 100) {
-      throw new ForbiddenException(
-        'poll duration canot visible more than 2 hours',
-      );
-    }
+    // if (new Date(expiryTime).getTime() - Date.now() > 2 * 60 * 60 * 100) {
+    //   throw new ForbiddenException(
+    //     'poll duration canot visible more than 2 hours',
+    //   );
+    // }
 
     const poll = new this.pollModel({
       title,

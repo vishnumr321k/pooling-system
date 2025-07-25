@@ -28,7 +28,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/create-poll" element={<CreatePolls />} />
-          <Route path="/update-poll" element={<UpdatePolls />} />
+          <Route path="/update-poll/:pollId" element={<UpdatePolls />} />
         </Routes>
         <ToastContainer
           position="top-right"

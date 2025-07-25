@@ -61,6 +61,12 @@ console.log('user:', user);
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async getPollById(@Param('id') id:string){
+    return this.pollService.findPollyById(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('private')
   async getPrivate(@Req() req: Request) {
     const user = req.user as any;

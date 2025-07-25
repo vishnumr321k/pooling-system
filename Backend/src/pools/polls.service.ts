@@ -73,4 +73,8 @@ export class PollService {
       expiryTime: { $gt: new Date() },
     });
   }
+
+  async findPollyById(pollId: string){
+    return this.pollModel.findById(pollId);
+  }
 }

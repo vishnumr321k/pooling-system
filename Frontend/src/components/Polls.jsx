@@ -26,7 +26,7 @@ const Polls = () => {
 
         setPolls(response.data);
 
-        console.log("response.data:", response.data);
+       
 
         response.data.forEach(async (poll) => {
           try {
@@ -82,7 +82,7 @@ const Polls = () => {
         }
       );
 
-      console.log("Vote submited:", response.data);
+     
       if (response.status === 201) {
         toast.success("Vote Submitted! 🎉");
         setRefresh(prev => !prev);
@@ -105,7 +105,7 @@ const Polls = () => {
               },
             }
           );
-          console.log(response.data);
+          
           setResults((prev) => ({
             ...prev,
             [poll._id]: response.data,
@@ -119,6 +119,9 @@ const Polls = () => {
   }, [polls]);
 
 
+  const handleDeletion = async () => {
+
+  }
 
   return (
     <div>
@@ -214,14 +217,14 @@ const Polls = () => {
                 {token && user.role === "admin" && (
                   <div className="flex w-full justify-end">
                     <div className="flex gap-4 w-1/3">
-                      <Link
-                        to="/"
+                      <button
+                       onClick={handleDeletion}
                         className="flex-1 bg-black border-2 border-black text-white py-2 rounded text-center hover:bg-gray-900"
                       >
                         Delete
-                      </Link>
+                      </button>
                       <Link
-                        to="/update-poll"
+                        to={`/update-poll/${poll._id}`}
                         className="flex-1 bg-white border-2 border-black text-black py-2 rounded text-center hover:bg-gray-100"
                       >
                         Update

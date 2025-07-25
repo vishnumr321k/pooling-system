@@ -8,7 +8,8 @@ import { useLocation } from "react-router-dom";
 const PollinPage = () => {
   const [polls, setPolls] = useState([]);
   const [results, setResults] = useState({});
-  
+  const [refresh, setRefresh] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -41,7 +42,7 @@ const PollinPage = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [refresh]);
 
    useEffect(() => {
     if (location.state?.refresh) {
@@ -77,7 +78,7 @@ const PollinPage = () => {
         </div>
       </div>
       <div className="p-10">
-        <Polls polls={polls} results={results} />
+        <Polls polls={polls} results={results} totalVotes = {totalVotes} />
       </div>
       <div className="p-10">
         <ExpirePolls polls={polls} results={results} />

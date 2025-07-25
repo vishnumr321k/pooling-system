@@ -3,7 +3,7 @@ import { AuthContext } from "../context/AuthContext";
 import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-const Polls = () => {
+const Polls = (props) => {
   const { token, user } = useContext(AuthContext);
   const [polls, setPolls] = useState([]);
   const [selectOptions, setSelectedOptions] = useState({});
@@ -25,8 +25,6 @@ const Polls = () => {
         );
 
         setPolls(response.data);
-
-       
 
         response.data.forEach(async (poll) => {
           try {
@@ -82,10 +80,9 @@ const Polls = () => {
         }
       );
 
-     
       if (response.status === 201) {
         toast.success("Vote Submitted! 🎉");
-        setRefresh(prev => !prev);
+        setRefresh((prev) => !prev);
       }
     } catch (error) {
       toast.error("Failed to Submit Vote.");
@@ -105,7 +102,7 @@ const Polls = () => {
               },
             }
           );
-          
+
           setResults((prev) => ({
             ...prev,
             [poll._id]: response.data,
@@ -118,10 +115,28 @@ const Polls = () => {
     fetchResults();
   }, [polls]);
 
+  const handleDeletion = async (pollId) => {
+    try {
+      console.log("pollId:", pollId);
+      const response = await axios.delete(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}polls/delete/${pollId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
-  const handleDeletion = async () => {
-
-  }
+      console.log(response);
+      if (response.status === 200) {
+        toast.success("Poll Deletion Completed! 🎉");
+        setPolls((prev) => prev.filter((p) => p._id !== pollId));
+      }
+    } catch (error) {
+      toast.error("Poll Deletion Failed! 🥲");
+      console.log(error);
+    }
+  };
 
   return (
     <div>
@@ -130,7 +145,9 @@ const Polls = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {polls.map((poll) => {
-           
+            const pollExpired = (poll) => {
+              return new Date(poll.expiryTime) < new Date();
+            }
             return (
               <div
                 key={poll._id}
@@ -153,7 +170,7 @@ const Polls = () => {
 
                 <div className="flex gap-4 text-gray-500 text-sm">
                   <p className="flex items-center gap-1">
-                    <i className="ri-user-line"></i> votes
+                    <i className="ri-user-line"></i>{props.totalVotes} votes
                   </p>
                   <p className="flex items-center gap-1">
                     <i className="ri-time-line"></i>{" "}
@@ -172,7 +189,7 @@ const Polls = () => {
                       <label
                         key={index}
                         className={`flex items-center border rounded p-2 cursor-pointer ${
-                          votedPolls.includes(poll._id)
+                          votedPolls.includes(poll._id) 
                             ? "opacity-50 pointer-events-none"
                             : ""
                         }`}
@@ -189,13 +206,12 @@ const Polls = () => {
                               [poll._id]: e.target.value,
                             });
                           }}
-                          disabled={votedPolls.includes(poll._id)}
+                          disabled={votedPolls.includes(poll._id) || pollExpired(poll)}
                         />
                         <span className="flex justify-between w-full">
                           {option}
                           <span className="ml-auto text-gray-500 text-sm">
-                            {results[poll._id]?.[option] || 0}{" "}
-                            votes
+                            {results[poll._id]?.[option] || 0} votes
                           </span>
                         </span>
                       </label>
@@ -203,8 +219,8 @@ const Polls = () => {
                   })}
                 </div>
 
-                {votedPolls.includes(poll._id) ? (
-                  <p className="text-green-500">You already voted</p>
+                {votedPolls.includes(poll._id) || pollExpired(poll) ? (
+                  <p className="text-green-500">{pollExpired(poll) ? 'Poll expired' : 'You already Voted'}</p>
                 ) : (
                   <button
                     onClick={() => handleVotesubmition(poll._id)}
@@ -213,13 +229,19 @@ const Polls = () => {
                     Submit Vote
                   </button>
                 )}
+                
+                {pollExpired(poll) && (
+                  <span className="ml-2 text-xs bg-red-500 text-white px-2 py-0.5 rounded">
+                    Expired
+                  </span>
+                )}
 
                 {token && user.role === "admin" && (
                   <div className="flex w-full justify-end">
                     <div className="flex gap-4 w-1/3">
                       <button
-                       onClick={handleDeletion}
-                        className="flex-1 bg-black border-2 border-black text-white py-2 rounded text-center hover:bg-gray-900"
+                        onClick={() => handleDeletion(poll._id)}
+                        className="cursor-pointer flex-1 bg-black border-2 border-black text-white py-2 rounded text-center hover:bg-gray-900"
                       >
                         Delete
                       </button>

@@ -7,10 +7,14 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Poll, PollDocument } from './polls.schema';
 import { Model, Types } from 'mongoose';
+import { User, UserDocument } from 'src/users/user.schema';
 
 @Injectable()
 export class PollService {
-  constructor(@InjectModel(Poll.name) private pollModel: Model<PollDocument>) {}
+  constructor(
+    @InjectModel(Poll.name) private pollModel: Model<PollDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+  ) {}
 
   async createPoll(
     title: string,
@@ -38,9 +42,8 @@ export class PollService {
   }
 
   async updatePoll(pollId: string, updateData: Partial<Poll>) {
-    
     const poll = await this.pollModel.findById(pollId);
-    
+
     if (!poll) {
       throw new NotAcceptableException('Poll not found');
     }
@@ -48,14 +51,14 @@ export class PollService {
     if (poll.expiryTime.getTime() < Date.now()) {
       throw new NotAcceptableException('Cannot edit expired poll');
     }
-    
+
     Object.assign(poll, updateData);
-   
+
     return poll.save();
   }
 
   async deletePoll(pollId: string) {
-    console.log('pollsId', pollId)
+    console.log('pollsId', pollId);
     return this.pollModel.findByIdAndDelete(pollId);
   }
 
@@ -74,7 +77,7 @@ export class PollService {
     });
   }
 
-  async findPollyById(pollId: string){
+  async findPollyById(pollId: string) {
     return this.pollModel.findById(pollId);
   }
 }

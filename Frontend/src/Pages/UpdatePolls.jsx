@@ -68,9 +68,7 @@ const UpdatePolls = () => {
     }
   }
 
-  useEffect(() => {
-    
-  })
+  
   return (
     <>
       <Header />

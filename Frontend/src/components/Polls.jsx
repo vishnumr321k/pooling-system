@@ -1,12 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 const Polls = () => {
   const { token, user } = useContext(AuthContext);
   const [polls, setPolls] = useState([]);
   const [selectOptions, setSelectedOptions] = useState({});
+  const [votedPolls, setVotedPolls] = useState([]);
+  const [results, setResults] = useState({});
+  const [refresh, setRefresh] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const fetchPublicData = async () => {
@@ -21,12 +25,41 @@ const Polls = () => {
         );
 
         setPolls(response.data);
+
+        console.log("response.data:", response.data);
+
+        response.data.forEach(async (poll) => {
+          try {
+            const response = await axios.get(
+              `${import.meta.env.VITE_BACKEND_BASE_URL}vote/has-voted/${
+                poll._id
+              }`,
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              }
+            );
+
+            if (response.data.hasVoted) {
+              setVotedPolls((prev) => [...prev, poll._id]);
+            }
+          } catch (error) {
+            console.error("Error checking voted status:", error);
+          }
+        });
       } catch (error) {
         console.log(error);
       }
     };
     fetchPublicData();
-  }, []);
+  }, [refresh]);
+
+  useEffect(() => {
+    if (location.state?.refresh) {
+      setRefresh((prev) => !prev);
+    }
+  }, [location.state]);
 
   const handleVotesubmition = async (pollId) => {
     const selectOption = selectOptions[pollId];
@@ -50,15 +83,42 @@ const Polls = () => {
       );
 
       console.log("Vote submited:", response.data);
-      if (response.status === 200) {
+      if (response.status === 201) {
         toast.success("Vote Submitted! 🎉");
-        window.location.reload();
+        setRefresh(prev => !prev);
       }
     } catch (error) {
-        toast.error('Failed to Submit Vote.');
-        console.log(error);
+      toast.error("Failed to Submit Vote.");
+      console.log(error);
     }
   };
+
+  useEffect(() => {
+    const fetchResults = async () => {
+      try {
+        for (let poll of polls) {
+          const response = await axios.get(
+            `${import.meta.env.VITE_BACKEND_BASE_URL}vote/result/${poll._id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          console.log(response.data);
+          setResults((prev) => ({
+            ...prev,
+            [poll._id]: response.data,
+          }));
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchResults();
+  }, [polls]);
+
+
 
   return (
     <div>
@@ -67,6 +127,7 @@ const Polls = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {polls.map((poll) => {
+           
             return (
               <div
                 key={poll._id}
@@ -92,7 +153,13 @@ const Polls = () => {
                     <i className="ri-user-line"></i> votes
                   </p>
                   <p className="flex items-center gap-1">
-                    <i className="ri-time-line"></i> days left
+                    <i className="ri-time-line"></i>{" "}
+                    {new Date(poll.expiryTime).toISOString().split("T")[0]},{" "}
+                    {new Date(poll.expiryTime)
+                      .toISOString()
+                      .split("T")[1]
+                      .slice(0, 5)}{" "}
+                    Time left
                   </p>
                 </div>
 
@@ -101,7 +168,11 @@ const Polls = () => {
                     return (
                       <label
                         key={index}
-                        className="flex items-center border rounded p-2 cursor-pointer"
+                        className={`flex items-center border rounded p-2 cursor-pointer ${
+                          votedPolls.includes(poll._id)
+                            ? "opacity-50 pointer-events-none"
+                            : ""
+                        }`}
                       >
                         <input
                           type="radio"
@@ -115,18 +186,31 @@ const Polls = () => {
                               [poll._id]: e.target.value,
                             });
                           }}
+                          disabled={votedPolls.includes(poll._id)}
                         />
-                        {option}
+                        <span className="flex justify-between w-full">
+                          {option}
+                          <span className="ml-auto text-gray-500 text-sm">
+                            {results[poll._id]?.[option] || 0}{" "}
+                            votes
+                          </span>
+                        </span>
                       </label>
                     );
                   })}
                 </div>
-                <button
-                  onClick={() => handleVotesubmition(poll._id)}
-                  className="w-full bg-gray-500 text-white font-semibold py-2 rounded mt-2 hover:bg-gray-600 transition"
-                >
-                  Submit Vote
-                </button>
+
+                {votedPolls.includes(poll._id) ? (
+                  <p className="text-green-500">You already voted</p>
+                ) : (
+                  <button
+                    onClick={() => handleVotesubmition(poll._id)}
+                    className="w-full bg-black text-white h-10 rounded-2xl"
+                  >
+                    Submit Vote
+                  </button>
+                )}
+
                 {token && user.role === "admin" && (
                   <div className="flex w-full justify-end">
                     <div className="flex gap-4 w-1/3">

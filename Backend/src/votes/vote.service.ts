@@ -51,4 +51,9 @@ export class VoteService {
 
     return result;
   }
+
+  async hasUserVoted(pollId: string, userId: string) {
+    const vote = await this.voteModel.findOne({ pollId, userId });
+    return { hasVoted: !!vote }; // returns { hasVoted: true } or { hasVoted: false }
+  }
 }

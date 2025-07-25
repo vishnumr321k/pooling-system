@@ -46,7 +46,7 @@ const handleCreatPoll = async () => {
     console.log('response:', response);
     if(response.status === 201){
         toast.success('Poll creation Completed! 🎉');
-        navigate('/pollin-page')
+        navigate('/pollin-page', {state: {refresh:true}});
     }
     } catch (error) {
         console.log(error);

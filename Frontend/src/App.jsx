@@ -1,10 +1,21 @@
 import React from 'react'
+import {BrowserRouter, Routes, Route} from 'react-router'
+import Login from './Pages/Login'
+import SignUp from './Pages/SignUp'
+import PollinPage from './Pages/PollinPage'
+import Home from './Pages/Home'
+
 
 const App = () => {
   return (
-    <div>
-      <h1 className='text-8xl font-mono bg-black text-white'>Hello</h1>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<Home/>}/>
+        <Route path='/login' element={<Login/>}/>
+        <Route path='/signup' element={<SignUp/>}/>
+        <Route path='/polling-page' element={<PollinPage/>}/>
+      </Routes>
+    </BrowserRouter>
   )
 }
 

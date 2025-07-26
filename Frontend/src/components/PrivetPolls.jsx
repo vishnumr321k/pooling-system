@@ -7,7 +7,7 @@ const PrivetPolls = (props) => {
   const { polls, results, setResults, votePolls, setPolls, setRefresh } = props;
   const { token, user } = useContext(AuthContext);
   const [selectOptions, setSelectedOptions] = useState({});
-
+console.log('votePolls:', votePolls)
   const handleVotesubmition = async (pollId) => {
     const selectOption = selectOptions[pollId];
     if (!selectOption) {
@@ -28,6 +28,8 @@ const PrivetPolls = (props) => {
           },
         }
       );
+
+      console.log('response.data:', response);
 
       if (response.status === 201) {
         toast.success("Vote Submitted! 🎉");

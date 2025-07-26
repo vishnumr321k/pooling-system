@@ -32,7 +32,6 @@ const PollinPage = () => {
           }
         );
 
-        
         const responsePrivetPolls = await axios.get(
           `${import.meta.env.VITE_BACKEND_BASE_URL}polls/private`,
           {
@@ -58,7 +57,28 @@ const PollinPage = () => {
                 },
               }
             );
-            
+
+            if (response.data.hasVoted) {
+              setVotedPolls((prev) => [...prev, poll._id]);
+            }
+          } catch (error) {
+            console.error("Error checking voted status:", error);
+          }
+        });
+
+         responsePrivetPolls.data.forEach(async (poll) => {
+          try {
+            const response = await axios.get(
+              `${import.meta.env.VITE_BACKEND_BASE_URL}vote/has-voted/${
+                poll._id
+              }`,
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              }
+            );
+
             if (response.data.hasVoted) {
               setVotedPolls((prev) => [...prev, poll._id]);
             }
@@ -76,7 +96,8 @@ const PollinPage = () => {
   useEffect(() => {
     const fetchResults = async () => {
       try {
-        for (let poll of polls) {
+        const allPolls = [...polls, ...privetPolls];
+        for (let poll of allPolls) {
           const response = await axios.get(
             `${import.meta.env.VITE_BACKEND_BASE_URL}vote/result/${poll._id}`,
             {
@@ -96,10 +117,10 @@ const PollinPage = () => {
       }
     };
 
-    if (polls.length > 0) {
+    if (polls.length > 0 || privetPolls.length > 0) {
       fetchResults();
     }
-  }, [polls]);
+  }, [polls, privetPolls]);
 
   const totalPolls = polls.length;
   const activePolls = polls.filter(
@@ -108,8 +129,6 @@ const PollinPage = () => {
   const totalVotes = Object.values(results).reduce((sum, optionCounts) => {
     return sum + Object.values(optionCounts).reduce((s, c) => s + c, 0);
   }, 0);
-
-
 
   return (
     <>
@@ -137,8 +156,8 @@ const PollinPage = () => {
           results={results}
           votePolls={votePolls}
           setResults={setResults}
-          setPolls = {setPolls}
-          setRefresh = {setRefresh}
+          setPolls={setPolls}
+          setRefresh={setRefresh}
         />
       </div>
 
@@ -149,8 +168,8 @@ const PollinPage = () => {
           results={results}
           votePolls={votePolls}
           setResults={setResults}
-          setPolls = {setPolls}
-          setRefresh = {setRefresh}
+          setPolls={setPolls}
+          setRefresh={setRefresh}
         />
       </div>
     </>

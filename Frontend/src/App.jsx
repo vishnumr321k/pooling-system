@@ -10,6 +10,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedWrapper from "./components/ProtectedWrapper";
 import CreatePolls from "./Pages/CreatePolls";
 import UpdatePolls from "./Pages/UpdatePolls";
+import AdminProtectWraper from "./components/AdminProtectWraper";
 
 const App = () => {
   return (
@@ -30,7 +31,9 @@ const App = () => {
             path="/create-poll"
             element={
               <ProtectedWrapper>
-                <CreatePolls />
+                <AdminProtectWraper>
+                  <CreatePolls />
+                </AdminProtectWraper>
               </ProtectedWrapper>
             }
           />
@@ -38,7 +41,9 @@ const App = () => {
             path="/update-poll/:pollId"
             element={
               <ProtectedWrapper>
-                <CreatePolls />
+                <AdminProtectWraper>
+                  <UpdatePolls />
+                </AdminProtectWraper>
               </ProtectedWrapper>
             }
           />

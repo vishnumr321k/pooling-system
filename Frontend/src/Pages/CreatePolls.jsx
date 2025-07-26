@@ -30,12 +30,13 @@ const handleCreatPoll = async () => {
     console.log('isPrivate:', isPrivate);
     console.log('specificUsers:', specificUsers);
     console.log('expiryTime:', expiryTime);
+    
     try {
           const response = await axios.post(`${import.meta.env.VITE_BACKEND_BASE_URL}polls/create`, {
         title, 
         options,
         isPrivate,
-        specificUsers,
+        allowedUsers:specificUsers,
         expiryTime,
     }, {
         headers: {

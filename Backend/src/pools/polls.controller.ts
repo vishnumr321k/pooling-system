@@ -18,6 +18,8 @@ import { UpdatePollDto } from './dto/update-poll.dto';
 import { Request } from 'express';
 import { title } from 'process';
 import { use } from 'passport';
+import { Type } from 'class-transformer';
+import { Types } from 'mongoose';
 
 @Controller('polls')
 export class PollsController {
@@ -27,14 +29,26 @@ export class PollsController {
   @Role('admin')
   @Post('create')
   async create(@Body() dto: CreatePollDto, @Req() req: Request) {
-    console.log('Endha mone... ene vilicho.')
+    console.log('Endha mone... ene vilicho.');
+    console.log('Monnuse nane create polls inde..');
     const user = req.user as any;
-console.log('user:', user);
+
+    let allowedUserIds: Types.ObjectId[] = [];
+
+    if (dto.isPrivate) {
+      const emailList = dto.allowedUsers
+        .split(',')
+        .map((email) => email.trim());
+
+      allowedUserIds = await this.pollService.findUserIdsByEmails(emailList);
+      allowedUserIds.push(new Types.ObjectId(user.userId));
+    }
+
     return this.pollService.createPoll(
       dto.title,
       dto.options,
       dto.isPrivate,
-      dto.allowedUsers ?? [],
+      allowedUserIds,
       new Date(dto.expiryTime),
       user.userId,
     );
@@ -57,19 +71,21 @@ console.log('user:', user);
   @UseGuards(JwtAuthGuard)
   @Get('public')
   async getPublic() {
+    console.log('Mone nane Public inde....');
     return this.pollService.findPublicActivePolls();
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  async getPollById(@Param('id') id:string){
-    return this.pollService.findPollyById(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('private')
   async getPrivate(@Req() req: Request) {
+    console.log('Mone nane getPrivet Ethitta...');
     const user = req.user as any;
     return this.pollService.findPrivatePollForUser(user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async getPollById(@Param('id') id: string) {
+    return this.pollService.findPollyById(id);
   }
 }

@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  ForbiddenException,
-  NotAcceptableException,
-  Type,
-} from '@nestjs/common';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Poll, PollDocument } from './polls.schema';
 import { Model, Types } from 'mongoose';
@@ -24,12 +19,6 @@ export class PollService {
     expiryTime: Date,
     createdBy: Types.ObjectId,
   ) {
-    // if (new Date(expiryTime).getTime() - Date.now() > 2 * 60 * 60 * 100) {
-    //   throw new ForbiddenException(
-    //     'poll duration canot visible more than 2 hours',
-    //   );
-    // }
-
     const poll = new this.pollModel({
       title,
       options,
@@ -63,21 +52,38 @@ export class PollService {
   }
 
   async findPublicActivePolls() {
-    return this.pollModel.find({
-      isPrivate: false,
-      expiryTime: { $gt: new Date() },
-    });
+    return await this.pollModel
+      .find({
+        isPrivate: false,
+      })
+      .exec();
   }
 
   async findPrivatePollForUser(userId: Types.ObjectId) {
-    return this.pollModel.find({
-      isPrivate: true,
-      allowedUser: userId,
-      expiryTime: { $gt: new Date() },
-    });
+    console.log('mone nane findPrivet Keritta');
+    console.log('userId:', userId);
+
+    const objectId = new Types.ObjectId(userId);
+    const response = await this.pollModel
+      .find({
+        isPrivate: true,
+        allowedUser: { $in: [objectId] },
+      })
+      .exec();
+
+    console.log('findPrivatePollForUser:', response);
+    return response;
   }
 
   async findPollyById(pollId: string) {
     return this.pollModel.findById(pollId);
+  }
+
+  async findUserIdsByEmails(email: string[]): Promise<Types.ObjectId[]> {
+    const users = await this.userModel
+      .find({ email: { $in: email } })
+      .select('_id');
+
+    return users.map((user) => user._id as Types.ObjectId);
   }
 }

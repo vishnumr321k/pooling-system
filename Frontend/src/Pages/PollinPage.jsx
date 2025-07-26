@@ -4,14 +4,24 @@ import Polls from "../components/Polls";
 import ExpirePolls from "../components/ExpirePolls";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import PrivetPolls from "../components/PrivetPolls";
 
 const PollinPage = () => {
   const [polls, setPolls] = useState([]);
+  const [privetPolls, setPrivetPolls] = useState([]);
   const [results, setResults] = useState({});
   const [refresh, setRefresh] = useState(false);
+  const [votePolls, setVotedPolls] = useState([]);
+  const location = useLocation();
 
   useEffect(() => {
-    const fetchData = async () => {
+    if (location.state?.refresh) {
+      setRefresh((prev) => !prev);
+    }
+  }, [location.state]);
+
+  useEffect(() => {
+    const fetchPolls = async () => {
       try {
         const response = await axios.get(
           `${import.meta.env.VITE_BACKEND_BASE_URL}polls/public`,
@@ -21,12 +31,53 @@ const PollinPage = () => {
             },
           }
         );
-        setPolls(response.data);
 
-        // Fetch results for all polls:
-        const allResults = {};
-        for (let poll of response.data) {
-          const res = await axios.get(
+        
+        const responsePrivetPolls = await axios.get(
+          `${import.meta.env.VITE_BACKEND_BASE_URL}polls/private`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        console.log("responsePrivetPolls.data:", responsePrivetPolls.data);
+        setPolls(response.data);
+        setPrivetPolls(responsePrivetPolls.data);
+
+        response.data.forEach(async (poll) => {
+          try {
+            const response = await axios.get(
+              `${import.meta.env.VITE_BACKEND_BASE_URL}vote/has-voted/${
+                poll._id
+              }`,
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              }
+            );
+            
+            if (response.data.hasVoted) {
+              setVotedPolls((prev) => [...prev, poll._id]);
+            }
+          } catch (error) {
+            console.error("Error checking voted status:", error);
+          }
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchPolls();
+  }, [refresh]);
+
+  useEffect(() => {
+    const fetchResults = async () => {
+      try {
+        for (let poll of polls) {
+          const response = await axios.get(
             `${import.meta.env.VITE_BACKEND_BASE_URL}vote/result/${poll._id}`,
             {
               headers: {
@@ -34,29 +85,31 @@ const PollinPage = () => {
               },
             }
           );
-          allResults[poll._id] = res.data;
+
+          setResults((prev) => ({
+            ...prev,
+            [poll._id]: response.data,
+          }));
         }
-        setResults(allResults);
       } catch (error) {
-        console.error(error);
+        console.log(error);
       }
     };
-    fetchData();
-  }, [refresh]);
 
-   useEffect(() => {
-    if (location.state?.refresh) {
-      setRefresh((prev) => !prev);
+    if (polls.length > 0) {
+      fetchResults();
     }
-  }, [location.state]);
-  
+  }, [polls]);
+
   const totalPolls = polls.length;
   const activePolls = polls.filter(
-    poll => new Date(poll.expiryTime) > new Date()
+    (poll) => new Date(poll.expiryTime) > new Date()
   ).length;
   const totalVotes = Object.values(results).reduce((sum, optionCounts) => {
     return sum + Object.values(optionCounts).reduce((s, c) => s + c, 0);
   }, 0);
+
+
 
   return (
     <>
@@ -78,10 +131,27 @@ const PollinPage = () => {
         </div>
       </div>
       <div className="p-10">
-        <Polls polls={polls} results={results} totalVotes = {totalVotes} />
+        <h2 className="text-2xl font-bold mb-4">Public Polls</h2>
+        <Polls
+          polls={polls}
+          results={results}
+          votePolls={votePolls}
+          setResults={setResults}
+          setPolls = {setPolls}
+          setRefresh = {setRefresh}
+        />
       </div>
+
       <div className="p-10">
-        <ExpirePolls polls={polls} results={results} />
+        <h2 className="text-2xl font-bold mb-4">Privet Polls</h2>
+        <PrivetPolls
+          polls={privetPolls}
+          results={results}
+          votePolls={votePolls}
+          setResults={setResults}
+          setPolls = {setPolls}
+          setRefresh = {setRefresh}
+        />
       </div>
     </>
   );

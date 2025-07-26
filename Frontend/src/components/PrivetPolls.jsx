@@ -3,9 +3,8 @@ import { AuthContext } from "../context/AuthContext";
 import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-const Polls = (props) => {
-  const { polls, results, setResults, votePolls, setPolls ,
-          setRefresh } = props;
+const PrivetPolls = (props) => {
+  const { polls, results, setResults, votePolls, setPolls, setRefresh } = props;
   const { token, user } = useContext(AuthContext);
   const [selectOptions, setSelectedOptions] = useState({});
 
@@ -66,12 +65,10 @@ const Polls = (props) => {
   return (
     <div>
       <div className="p-4">
-      
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {polls.map((poll) => {
             const pollExpired = (poll) => {
-              const result =  new Date(poll.expiryTime) < new Date();
+              const result = new Date(poll.expiryTime) < new Date();
               return result;
             };
             return (
@@ -197,4 +194,4 @@ const Polls = (props) => {
   );
 };
 
-export default Polls;
+export default PrivetPolls;

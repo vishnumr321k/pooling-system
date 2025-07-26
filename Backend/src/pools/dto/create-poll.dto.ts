@@ -17,8 +17,8 @@ export class CreatePollDto {
   @IsBoolean()
   isPrivate: boolean;
 
-  @IsOptional()
-  allowedUsers?: Types.ObjectId[];
+  @IsNotEmpty()
+  allowedUsers: string;
 
   @IsDateString()
   expiryTime: string;

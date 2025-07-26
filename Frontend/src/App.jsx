@@ -16,7 +16,6 @@ const App = () => {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />} />
           <Route
             path="/pollin-page"
             element={
@@ -25,10 +24,24 @@ const App = () => {
               </ProtectedWrapper>
             }
           />
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/create-poll" element={<CreatePolls />} />
-          <Route path="/update-poll/:pollId" element={<UpdatePolls />} />
+          <Route
+            path="/create-poll"
+            element={
+              <ProtectedWrapper>
+                <CreatePolls />
+              </ProtectedWrapper>
+            }
+          />
+          <Route
+            path="/update-poll/:pollId"
+            element={
+              <ProtectedWrapper>
+                <CreatePolls />
+              </ProtectedWrapper>
+            }
+          />
         </Routes>
         <ToastContainer
           position="top-right"

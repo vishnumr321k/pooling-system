@@ -22,15 +22,16 @@ const Header = () => {
               {token && (
                 <>
                   <span className="text-gray-700 font-medium mt-2">
-                    {user?.name}
+                    {user?.name} 
                   </span>
 
                   {user.role === "admin" && (
+                    
                     <Link
                       to="/create-poll"
                       className="inline-flex items-center justify-center px-4 py-2 bg-black text-white rounded-full hover:bg-gray-800 transition"
                     >
-                      Create Poll +
+                      Create Poll + (Admin)
                     </Link>
                   )}
                 </>

@@ -71,7 +71,7 @@ export class PollService {
       })
       .exec();
 
-    console.log('findPrivatePollForUser:', response);
+    
     return response;
   }
 

@@ -29,8 +29,6 @@ export class PollsController {
   @Role('admin')
   @Post('create')
   async create(@Body() dto: CreatePollDto, @Req() req: Request) {
-    console.log('Endha mone... ene vilicho.');
-    console.log('Monnuse nane create polls inde..');
     const user = req.user as any;
 
     let allowedUserIds: Types.ObjectId[] = [];
@@ -71,7 +69,7 @@ export class PollsController {
   @UseGuards(JwtAuthGuard)
   @Get('public')
   async getPublic() {
-    console.log('Mone nane Public inde....');
+    
     return this.pollService.findPublicActivePolls();
   }
 

@@ -24,20 +24,16 @@ import { Types } from 'mongoose';
 @Controller('polls')
 export class PollsController {
   constructor(private readonly pollService: PollService) {}
-
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Role('admin')
   @Post('create')
   async create(@Body() dto: CreatePollDto, @Req() req: Request) {
     const user = req.user as any;
-
     let allowedUserIds: Types.ObjectId[] = [];
-
     if (dto.isPrivate) {
       const emailList = dto.allowedUsers
         .split(',')
         .map((email) => email.trim());
-
       allowedUserIds = await this.pollService.findUserIdsByEmails(emailList);
       allowedUserIds.push(new Types.ObjectId(user.userId));
     }
@@ -69,14 +65,12 @@ export class PollsController {
   @UseGuards(JwtAuthGuard)
   @Get('public')
   async getPublic() {
-    
     return this.pollService.findPublicActivePolls();
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('private')
   async getPrivate(@Req() req: Request) {
-    console.log('Mone nane getPrivet Ethitta...');
     const user = req.user as any;
     return this.pollService.findPrivatePollForUser(user.userId);
   }

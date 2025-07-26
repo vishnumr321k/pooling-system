@@ -60,9 +60,6 @@ export class PollService {
   }
 
   async findPrivatePollForUser(userId: Types.ObjectId) {
-    console.log('mone nane findPrivet Keritta');
-    console.log('userId:', userId);
-
     const objectId = new Types.ObjectId(userId);
     const response = await this.pollModel
       .find({
@@ -70,8 +67,6 @@ export class PollService {
         allowedUser: { $in: [objectId] },
       })
       .exec();
-
-    
     return response;
   }
 
@@ -83,7 +78,6 @@ export class PollService {
     const users = await this.userModel
       .find({ email: { $in: email } })
       .select('_id');
-
     return users.map((user) => user._id as Types.ObjectId);
   }
 }

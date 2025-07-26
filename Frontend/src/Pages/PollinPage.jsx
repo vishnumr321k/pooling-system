@@ -168,7 +168,7 @@ const PollinPage = () => {
           results={results}
           votePolls={votePolls}
           setResults={setResults}
-          setPolls={setPolls}
+          setPolls={setPrivetPolls}
           setRefresh={setRefresh}
         />
       </div>

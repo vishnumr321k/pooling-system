@@ -66,6 +66,9 @@ const SignUp = () => {
         >
           Sign Up
         </button>
+        <br />
+        <br />
+           <p className="text-center">You have a Account: <a href="/" className="text-blue-700  ">Login</a></p>
       </div>
     </div>
   );

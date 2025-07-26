@@ -60,7 +60,11 @@ const Login = () => {
         >
           Login
         </button>
+        <br />
+        <br />
+        <p className="text-center">You Don't have a Account: <a href="/signup" className="text-blue-700  ">Sign Up</a></p>
       </div>
+      
     </div>
   );
 };

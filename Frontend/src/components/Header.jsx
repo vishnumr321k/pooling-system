@@ -12,7 +12,7 @@ const Header = () => {
       <hr className="border-1" />
       <div className="container mx-auto px-4 lg:px-6">
         <div className="flex flex-col lg:flex-row justify-between items-center py-4 gap-4">
-          <span>Pollin System</span>
+          <span className="font-mono text-2xl">Pollin System</span>
 
           <div className="flex flex-col lg:flex-row items-center gap-4 w-full lg:w-auto">
             <div className="relative w-full lg:w-auto"></div>
@@ -21,7 +21,7 @@ const Header = () => {
 
               {token && (
                 <>
-                  <span className="text-gray-700 font-medium mt-2">
+                  <span className="text-gray-700 font-mono mt-2">
                     {user?.name} 
                   </span>
 
@@ -29,7 +29,7 @@ const Header = () => {
                     
                     <Link
                       to="/create-poll"
-                      className="inline-flex items-center justify-center px-4 py-2 bg-black text-white rounded-full hover:bg-gray-800 transition"
+                      className="inline-flex font-mono items-center justify-center px-4 py-2 bg-black text-white rounded-full hover:bg-gray-800 transition"
                     >
                       Create Poll + (Admin)
                     </Link>
@@ -40,7 +40,7 @@ const Header = () => {
               {!token ? (
                 <Link
                   to="/login"
-                  className="inline-flex items-center justify-center w-20 h-10 bg-black text-white rounded-2xl hover:bg-gray-800 transition"
+                  className="inline-flex font-mono items-center justify-center w-20 h-10 bg-black text-white rounded-2xl hover:bg-gray-800 transition"
                 >
                   Login
                 </Link>

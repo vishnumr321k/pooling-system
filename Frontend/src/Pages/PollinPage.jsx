@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Polls from "../components/Polls";
-import ExpirePolls from "../components/ExpirePolls";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 import PrivetPolls from "../components/PrivetPolls";
